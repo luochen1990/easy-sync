@@ -34,7 +34,7 @@ def sync_compatible(fn: Callable[P, Awaitable[R]]) -> Callable[P, Waitable[R]]:
     ...
 
 @overload
-def sync_compatible(sync_fn: Callable[P, R]) -> Callable[ [Callable[P, Awaitable[R]]], Callable[P, Waitable[R]]]:
+def sync_compatible(*, sync_fn: Callable[P, R]) -> Callable[ [Callable[P, Awaitable[R]]], Callable[P, Waitable[R]]]:
     ...
 
 def sync_compatible( #type: ignore
