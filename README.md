@@ -1,7 +1,7 @@
 Easy Async
 ==========
 
-This is a WIP project without a proper implementation yet.
+**NOTE: This is a WIP project without a proper implementation yet.**
 
 But tests are added, and things are strictly type checked here.
 
@@ -10,6 +10,32 @@ I would be extremely grateful if someone could contribute a proper implementatio
 Any discussion about it's implementation is welcome [here](https://github.com/luochen1990/easy-async/discussions).
 
 There is also a discussion on [StackOverflow Question](https://stackoverflow.com/questions/77274838/how-do-i-wrap-asyncio-calls-in-general-purpose-non-async-functions).
+
+Usage
+-----
+
+```python
+from easy_async import sync_compatible
+
+@sync_compatible
+async def async_add(a: int, b: int) -> int:
+    await asyncio.sleep(1)
+    ''' Add two numbers asynchronously '''
+    return a + b
+
+def do_sync():
+
+    print(async_add(1, 2).wait())
+    print(async_add(3, 4).wait())
+
+do_sync()
+
+async def async_main():
+    result = await async_add(1, 2)
+    print(result)
+
+asyncio.run(async_main())
+```
 
 Run tests
 ---------
@@ -20,8 +46,7 @@ Currently, if you run `pytest` you will got:
 
 ```text
 ========================================== short test summary info ===========================================
-FAILED test/bad_impl_1/test_impl_1.py::test_impl_1 - RuntimeError: asyncio.run() cannot be called from a running event loop
-FAILED test/bad_impl_2/test_impl_2.py::test_impl_2 - RuntimeError: This function can only be run from an AnyIOworker thread
-============================================= 2 failed in 3.06s ==============================================
+FAILED test/asyncer_impl/test_asyncer_impl.py::test_asyncer_impl - RuntimeError: This function can only be run from an AnyIO worker thread
+FAILED test/test_nested_case.py::test_nested_case - RuntimeError: asyncio.run() cannot be called from a running event loop
+======================================== 2 failed, 1 passed in 6.06s =========================================
 ```
-
