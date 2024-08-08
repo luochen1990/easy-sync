@@ -1,0 +1,80 @@
+# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
+name: Python package
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dev/test dependencies
+      run: |
+        python -m pip install --upgrade pip poetry
+        python -m pip install flake8 pytest pytest-xdist pytest-cov pyright
+    - name: Install This Package
+      run: |
+        if [[ "${{ github.event.head_commit.message }}" == "version:"* ]]; then
+          echo "This is a version bump commit. Installing the package from built wheel."
+          THIS_PACKAGE_WHL=$(poetry build -f wheel | grep whl | rev | cut -d' ' -f1 | rev)
+          pip install ./dist/$THIS_PACKAGE_WHL
+        else
+          echo "This is not a version bump commit. Installing the package from source code."
+          pip install -e .
+        fi
+    - name: Test with coverage
+      env:
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY_DEEPSEEK }}
+        OPENAI_BASE_URL: https://api.deepseek.com
+        GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+        GOOGLE_ENGINE_ID: ${{ secrets.GOOGLE_ENGINE_ID }}
+      run: |
+        if [[ "${{ github.event.head_commit.message }}" == "version:"* ]]; then
+          echo "This is a version bump commit, run test without coverage."
+          COV_ARG=""
+        else
+          echo "This is not a version bump commit, run test with coverage."
+          COV_ARG="--cov=src --cov-report=term --cov-report=xml"
+        fi
+
+        if [ -n "$RUNNER_DEBUG" || -n "$COV_ARG" ]; then
+          export DEBUG=True
+        fi
+        if [ -n "$RUNNER_DEBUG" ]; then
+          DBG_ARG="-n0 -s"
+        else
+          DBG_ARG=""
+        fi
+        pytest $DBG_ARG $COV_ARG
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        flags: unittests
+        file: coverage.xml
+        verbose: true
+    - name: Type checking with pyright
+      run: |
+        pyright
+    - name: Lint with flake8
+      run: |
+        # stop the build if there are Python syntax errors or undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
