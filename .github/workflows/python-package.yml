@@ -40,10 +40,6 @@ jobs:
         fi
     - name: Test with coverage
       env:
-        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY_DEEPSEEK }}
-        OPENAI_BASE_URL: https://api.deepseek.com
-        GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
-        GOOGLE_ENGINE_ID: ${{ secrets.GOOGLE_ENGINE_ID }}
       run: |
         if [[ "${{ github.event.head_commit.message }}" == "version:"* ]]; then
           echo "This is a version bump commit, run test without coverage."
@@ -57,7 +53,7 @@ jobs:
           export DEBUG=True
         fi
         if [ -n "$RUNNER_DEBUG" ]; then
-          DBG_ARG="-n0 -s"
+          DBG_ARG="-s"
         else
           DBG_ARG=""
         fi
