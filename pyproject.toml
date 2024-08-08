@@ -1,9 +1,9 @@
 [tool.poetry]
-name = "easy-async"
+name = "easy-sync"
 version = "0.1.0"
-description = "Implement a Python async function and get it's sync version for free"
+description = "Provide sync compatibility for your async functions"
 authors = [ "Luo Chen <luochen1990@gmail.com>" ]
-repository = "https://github.com/luochen1990/easy-async"
+repository = "https://github.com/luochen1990/easy-sync"
 readme = "README.md"
 include = ["src"]
 

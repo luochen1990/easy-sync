@@ -1,5 +1,7 @@
-Easy Async
-==========
+Easy Sync
+=========
+
+Provide sync compatibility for your async functions
 
 Motivation
 ----------
@@ -52,7 +54,7 @@ asyncio.run(async_main())
 
 I would be extremely grateful if someone could contribute a proper implementation.
 
-Any discussion about it's implementation is welcome [here](https://github.com/luochen1990/easy-async/discussions).
+Any discussion about it's implementation is welcome [here](https://github.com/luochen1990/easy-sync/discussions).
 
 There is also a discussion on [StackOverflow Question](https://stackoverflow.com/questions/77274838/how-do-i-wrap-asyncio-calls-in-general-purpose-non-async-functions).
 
