@@ -11,6 +11,16 @@ Any discussion about it's implementation is welcome [here](https://github.com/lu
 
 There is also a discussion on [StackOverflow Question](https://stackoverflow.com/questions/77274838/how-do-i-wrap-asyncio-calls-in-general-purpose-non-async-functions).
 
+Motivation
+----------
+
+I don't want to always duplicate implementations for both synchronous and asynchronous versions of the same thing, as it is a waste of time.
+
+So I hope there is some magic which can turn my asynchronous function implementations into synchronous versions.
+
+I call this magic `@sync_compatible` here, with this decorator, your function `f` can be called via both `await f(x)` (in a asynchronous context) or `f(x).wait()` (in a synchronous context).
+
+
 Usage
 -----
 
