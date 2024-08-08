@@ -1,34 +1,37 @@
 import asyncio
+from functools import wraps
 import asyncer
-from typing import Callable, Coroutine, TypeVar
-from typing_extensions import ParamSpec
+from typing import Awaitable, Callable, TypeVar
+from typing_extensions import ParamSpec, override
 import easy_async
 
 
-X = TypeVar("X")
-Y = TypeVar("Y")
 P = ParamSpec("P")
 R = TypeVar("R")
 
 
-class Waitable(easy_async.Waitable[X, Y, R]):
+class Waitable(easy_async.Waitable[R]):
     ''' A class to represent the result of an async operation '''
 
-    def wait(self) -> R:
-        #return asyncer.syncify(lambda: self._coroutine)()
-        return asyncer.syncify(lambda: self._coroutine, raise_sync_error=False)()
+    @override
+    def _wait_async_thunk(self) -> R:
+        return asyncer.syncify(self._async_thunk, raise_sync_error=False)() #type: ignore
 
 
-def sync_compatible(fn: Callable[P, Coroutine[X, Y, R]]) -> Callable[P, Waitable[X, Y, R]]:
+def sync_compatible(fn: Callable[P, Awaitable[R]]) -> Callable[P, Waitable[R]]:
 
-    def wrapper(*args: P.args, **kwargs: P.kwargs) -> Waitable[X, Y, R]:
-        awaitable = fn(*args, **kwargs)
-        return Waitable(awaitable)
+    @wraps(fn)
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> Waitable[R]:
+
+        def async_thunk() -> Awaitable[R]:
+            return fn(*args, **kwargs)
+
+        return Waitable(async_thunk=async_thunk, sync_thunk=None)
 
     return wrapper
 
 
-def test_asyncer_impl():
+def test_asyncer_impl_nested_case():
 
     @sync_compatible
     async def async_add(a: int, b: int) -> int:
