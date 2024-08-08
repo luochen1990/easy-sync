@@ -39,7 +39,6 @@ jobs:
           pip install -e .
         fi
     - name: Test with coverage
-      env:
       run: |
         if [[ "${{ github.event.head_commit.message }}" == "version:"* ]]; then
           echo "This is a version bump commit, run test without coverage."
