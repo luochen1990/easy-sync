@@ -3,14 +3,14 @@ from functools import wraps
 import asyncer
 from typing import Awaitable, Callable, TypeVar, ParamSpec
 import pytest
-import easy_async
+import easy_sync
 
 
 P = ParamSpec("P")
 R = TypeVar("R")
 
 
-class Waitable(easy_async.Waitable[R]):
+class Waitable(easy_sync.Waitable[R]):
     ''' A class to represent the result of an async operation '''
 
     #@override

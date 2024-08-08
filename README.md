@@ -28,7 +28,7 @@ Usage
 ### The Magic Style (WIP)
 
 ```python
-from easy_async import sync_compatible
+from easy_sync import sync_compatible
 
 @sync_compatible
 async def async_add(a: int, b: int) -> int:
@@ -66,7 +66,7 @@ Use this helper to just reuse name only, you need to provide the sync version yo
 This is not our final goal, but at least it solves the naming problem for now :)
 
 ```python
-from easy_async import sync_compatible
+from easy_sync import sync_compatible
 
 @sync_compatible(sync_fn = _sync_add)
 async def async_add(a: int, b: int) -> int:

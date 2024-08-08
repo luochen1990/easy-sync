@@ -1,6 +1,6 @@
 import asyncio
 import time
-from easy_async import sync_compatible
+from easy_sync import sync_compatible
 
 def _sync_add(a: int, b: int) -> int:
     ''' Add two numbers synchronously '''

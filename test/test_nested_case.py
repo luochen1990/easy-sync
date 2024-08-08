@@ -1,6 +1,6 @@
 import pytest
 import asyncio
-from easy_async import sync_compatible
+from easy_sync import sync_compatible
 
 @sync_compatible
 async def async_add(a: int, b: int) -> int:
