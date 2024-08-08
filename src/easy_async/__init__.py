@@ -98,4 +98,4 @@ def sync_compatible( #type: ignore
     if asyncio.iscoroutinefunction(sync_fn):
         return wrapper_maker_maker(None)(sync_fn)
     else:
-        return wrapper_maker_maker(sync_fn)
+        return wrapper_maker_maker(sync_fn) #type: ignore
