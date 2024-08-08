@@ -15,7 +15,8 @@ class Waitable(easy_async.Waitable[X, Y, R]):
     ''' A class to represent the result of an async operation '''
 
     def wait(self) -> R:
-        return asyncer.syncify(lambda: self._coroutine)()
+        #return asyncer.syncify(lambda: self._coroutine)()
+        return asyncer.syncify(lambda: self._coroutine, raise_sync_error=False)()
 
 
 def sync_compatible(fn: Callable[P, Coroutine[X, Y, R]]) -> Callable[P, Waitable[X, Y, R]]:
