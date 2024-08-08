@@ -1,4 +1,5 @@
 import asyncio
+import asyncer
 from typing import Callable, Coroutine, TypeVar
 from typing_extensions import ParamSpec
 import easy_async
@@ -14,7 +15,7 @@ class Waitable(easy_async.Waitable[X, Y, R]):
     ''' A class to represent the result of an async operation '''
 
     def wait(self) -> R:
-        return asyncio.run(self._coroutine)
+        return asyncer.syncify(lambda: self._coroutine)()
 
 
 def sync_compatible(fn: Callable[P, Coroutine[X, Y, R]]) -> Callable[P, Waitable[X, Y, R]]:
@@ -26,7 +27,7 @@ def sync_compatible(fn: Callable[P, Coroutine[X, Y, R]]) -> Callable[P, Waitable
     return wrapper
 
 
-def test_impl_1():
+def test_asyncer_impl():
 
     @sync_compatible
     async def async_add(a: int, b: int) -> int:

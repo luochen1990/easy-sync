@@ -1,3 +1,4 @@
+import asyncio
 from types import TracebackType
 from typing import Callable, Coroutine, TypeVar
 from typing_extensions import ParamSpec
@@ -30,7 +31,8 @@ class Waitable(Coroutine[X, Y, R]):
     def wait(self) -> R:
         ''' sync wait for the result '''
 
-        ...  #TODO: waiting for a implementation
+        ...  #TODO: waiting for a better implementation
+        return asyncio.run(self._coroutine)
 
 
 def sync_compatible(fn: Callable[P, Coroutine[X, Y, R]]) -> Callable[P, Waitable[X, Y, R]]:
