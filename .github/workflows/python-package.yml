@@ -33,10 +33,10 @@ jobs:
         if [[ "${{ github.event.head_commit.message }}" == "version:"* ]]; then
           echo "This is a version bump commit. Installing the package from built wheel."
           THIS_PACKAGE_WHL=$(poetry build -f wheel | grep whl | rev | cut -d' ' -f1 | rev)
-          pip install ./dist/$THIS_PACKAGE_WHL
+          pip install ./dist/$THIS_PACKAGE_WHL[test,dev]
         else
           echo "This is not a version bump commit. Installing the package from source code."
-          pip install -e .
+          pip install -e .[test,dev]
         fi
     - name: Test with coverage
       run: |
