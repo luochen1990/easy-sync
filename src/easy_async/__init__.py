@@ -1,7 +1,6 @@
 import asyncio
 from functools import wraps
-from typing import Awaitable, Callable, TypeAlias, TypeVar, overload
-from typing_extensions import ParamSpec
+from typing import Awaitable, Callable, TypeAlias, TypeVar, ParamSpec, overload
 
 
 P = ParamSpec("P")

@@ -1,9 +1,8 @@
 import asyncio
 from functools import wraps
 import asyncer
-from typing import Awaitable, Callable, TypeVar
+from typing import Awaitable, Callable, TypeVar, ParamSpec
 import pytest
-from typing_extensions import ParamSpec, override
 import easy_async
 
 
@@ -14,7 +13,7 @@ R = TypeVar("R")
 class Waitable(easy_async.Waitable[R]):
     ''' A class to represent the result of an async operation '''
 
-    @override
+    #@override
     def _wait_async_thunk(self) -> R:
         return asyncer.syncify(self._async_thunk, raise_sync_error=False)() #type: ignore
 
