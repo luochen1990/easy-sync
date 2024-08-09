@@ -17,7 +17,7 @@ Features
 --------
 
 1. Use a single name of function for both async and sync version
-2. Automatic provide a sync vertion from async version (WIP)
+2. Automatic provide a sync vertion from async version (code generation underground)
 3. Lightweight, pure python, and no dependencies
 4. Strict type annotation (validated by pylance the strict mode)
 5. Unit test, and test coverage ratio is monitored
@@ -25,7 +25,7 @@ Features
 Usage
 -----
 
-### The Magic Style (WIP)
+### The Magic Style
 
 ```python
 from easy_sync import sync_compatible
@@ -50,13 +50,18 @@ async def async_main():
 asyncio.run(async_main())
 ```
 
-**NOTE: This usage is WIP and without a proper implementation yet.**
+**NOTE: There are some requirements**
 
-I would be extremely grateful if someone could contribute a proper implementation.
+This will generate a sync version code of your async function, which replaces all `await f(...)` into `f(...).wait()` and `await asyncio.sleep(...)` into `time.sleep(...)`.
 
-Any discussion about it's implementation is welcome [here](https://github.com/luochen1990/easy-sync/discussions).
+So you need to make sure all `await` statement is **sync compatible**.
 
-There is also a discussion on [StackOverflow Question](https://stackoverflow.com/questions/77274838/how-do-i-wrap-asyncio-calls-in-general-purpose-non-async-functions).
+A statement is **sync compatible** here if it is one of the following cases:
+
+1. The called function `f` is decorated with `@sync_compatible` decorator, and called like `await f(...)`
+2. The called function is exactly `asyncio.sleep`, and the statement is literally `await asyncio.sleep(...)`
+
+For other case, you might need to define a wrapper for yourself, via **The Name Reusing Style** of `@sync_compatible`
 
 
 ### The Name Reusing Style
