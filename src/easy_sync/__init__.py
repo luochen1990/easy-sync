@@ -1,6 +1,7 @@
 import asyncio
 from functools import wraps
 from typing import Awaitable, Callable, TypeAlias, TypeVar, ParamSpec, overload
+from easy_sync.transform import transform_function_to_sync
 
 
 P = ParamSpec("P")
@@ -23,11 +24,8 @@ class Waitable(Awaitable[R]):
         return self._sync_thunk()
 
     def _wait_async_thunk(self) -> R:
-        ''' sync wait for the result '''
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        r = loop.run_until_complete(self._async_thunk())
-        return r
+        ''' deprecated, only keeped for POC '''
+        ...
 
 
 @overload
@@ -98,6 +96,8 @@ def sync_compatible( #type: ignore
         return wrapper_maker
 
     if asyncio.iscoroutinefunction(sync_fn):
-        return wrapper_maker_maker(None)(sync_fn)
+        async_fn = sync_fn # the function is async actually
+        real_sync_fn = transform_function_to_sync(async_fn)
+        return wrapper_maker_maker(real_sync_fn)(async_fn)
     else:
         return wrapper_maker_maker(sync_fn) #type: ignore

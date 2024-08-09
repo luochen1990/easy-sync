@@ -1,4 +1,3 @@
-import pytest
 import asyncio
 from easy_sync import sync_compatible
 
@@ -8,7 +7,6 @@ async def async_add(a: int, b: int) -> int:
     ''' Add two numbers asynchronously '''
     return a + b
 
-@pytest.mark.xfail(reason="WIP")
 def test_nested_case():
 
     def do_sync():
