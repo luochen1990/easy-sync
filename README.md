@@ -78,7 +78,7 @@ For other case, you might need to define a wrapper for yourself, via **The Name 
 
 Use this helper to just reuse name only, you need to provide the sync version yourself.
 
-This is not our final goal, but at least it solves the naming problem for now :)
+This is useful to define your own wrapper, or cover some special cases the magic style cannot handle.
 
 ```python
 from easy_sync import sync_compatible
