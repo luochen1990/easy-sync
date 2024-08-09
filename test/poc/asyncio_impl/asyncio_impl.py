@@ -1,18 +1,28 @@
 import asyncio
 from functools import wraps
-from typing import Awaitable, Callable, TypeVar, ParamSpec
+from typing import Awaitable, Callable, TypeAlias, TypeVar, ParamSpec
 import pytest
-import easy_sync
 
 
 P = ParamSpec("P")
 R = TypeVar("R")
 
+Thunk : TypeAlias = Callable[[], R]
 
-class Waitable(easy_sync.Waitable[R]):
+class Waitable(Awaitable[R]):
     ''' A class to represent the result of an async operation '''
 
-    #@override
+    def __init__(self, async_thunk: Thunk[Awaitable[R]], sync_thunk: Thunk[R] | None):
+        self._async_thunk = async_thunk
+        self._sync_thunk = sync_thunk or self._wait_async_thunk
+
+    def __await__(self):
+        return self._async_thunk().__await__()
+
+    def wait(self) -> R:
+        ''' sync wait for the result '''
+        return self._sync_thunk()
+
     def _wait_async_thunk(self) -> R:
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)

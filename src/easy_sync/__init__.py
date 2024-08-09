@@ -12,9 +12,9 @@ Thunk : TypeAlias = Callable[[], R]
 class Waitable(Awaitable[R]):
     ''' A class to represent the result of an async operation '''
 
-    def __init__(self, async_thunk: Thunk[Awaitable[R]], sync_thunk : Thunk[R] | None):
+    def __init__(self, async_thunk: Thunk[Awaitable[R]], sync_thunk : Thunk[R]):
         self._async_thunk = async_thunk
-        self._sync_thunk = sync_thunk or self._wait_async_thunk
+        self._sync_thunk = sync_thunk
 
     def __await__(self):
         return self._async_thunk().__await__()
@@ -22,10 +22,6 @@ class Waitable(Awaitable[R]):
     def wait(self) -> R:
         ''' sync wait for the result '''
         return self._sync_thunk()
-
-    def _wait_async_thunk(self) -> R:
-        ''' deprecated, only keeped for POC '''
-        ... # pragma: no cover
 
 
 @overload
@@ -78,7 +74,7 @@ def sync_compatible( #type: ignore
         ```
     '''
 
-    def wrapper_maker_maker(sync_fn: Callable[P, R] | None) -> Callable[ [Callable[P, Awaitable[R]]], Callable[P, Waitable[R]]]:
+    def wrapper_maker_maker(sync_fn: Callable[P, R]) -> Callable[ [Callable[P, Awaitable[R]]], Callable[P, Waitable[R]]]:
         def wrapper_maker(fn: Callable[P, Awaitable[R]]) -> Callable[P, Waitable[R]]:
 
             @wraps(fn)
@@ -90,7 +86,7 @@ def sync_compatible( #type: ignore
                 def async_thunk() -> Awaitable[R]:
                     return fn(*args, **kwargs)
 
-                return Waitable(async_thunk=async_thunk, sync_thunk=sync_thunk if sync_fn else None)
+                return Waitable(async_thunk=async_thunk, sync_thunk=sync_thunk)
 
             return wrapper
         return wrapper_maker
