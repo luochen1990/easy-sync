@@ -6,6 +6,12 @@ import textwrap
 P = ParamSpec("P")
 R = TypeVar("R")
 
+# def _is_sync_compatible_decorator(decorator: ast.expr) -> bool:
+#     if isinstance(decorator, ast.Name) and decorator.id == 'sync_compatible':
+#         return True
+#     #elif isinstance(decorator, ast.Call) and isinstance(decorator.func, ast.Name) and decorator.func.id == 'sync_compatible':
+#     #    return True
+#     return False
 
 class FunctionTransformer(ast.NodeTransformer):
     def __init__(self):
@@ -13,20 +19,14 @@ class FunctionTransformer(ast.NodeTransformer):
 
     def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef):
         # 移除 @sync_compatible 装饰器
-        new_decorator_list : list[ast.expr] = []
-        for decorator in node.decorator_list:
-            if isinstance(decorator, ast.Call) and isinstance(decorator.func, ast.Name) and decorator.func.id == 'sync_compatible':
-                continue  # 跳过带参数的 @sync_compatible 装饰器
-            elif isinstance(decorator, ast.Name) and decorator.id == 'sync_compatible':
-                continue  # 跳过直接的 @sync_compatible 装饰器
-            new_decorator_list.append(decorator)
+        #new_decorator_list = [decorator for decorator in node.decorator_list if not _is_sync_compatible_decorator(decorator)]
 
         # 将 async def 转换为 def，并修改函数名
         new_node = ast.FunctionDef(
             name=node.name + '__sync__',
             args=node.args,
             body=node.body,
-            decorator_list=new_decorator_list,
+            decorator_list=[], #移除所有装饰器，因为它们是为异步函数设计的，很可能不适用于同步函数
             returns=node.returns,
             type_comment=node.type_comment,
             type_params=getattr(node, "type_params", []), #NOTE: 只有3.12之后的版本才有这个属性
@@ -75,8 +75,8 @@ def transform_function_to_sync(func: Callable[P, Awaitable[R]]) -> Callable[P, R
 
     #print("new_tree", ast.dump(new_tree, indent=2))
 
-    print("new_source_code:")
-    print(new_source_code)
+    #print("new_source_code:")
+    #print(new_source_code)
 
     # 编译修改后的AST为代码对象
     code = compile(new_source_code, filename="<ast>", mode="exec")
@@ -88,7 +88,7 @@ def transform_function_to_sync(func: Callable[P, Awaitable[R]]) -> Callable[P, R
 
     if transformer.need_time_import:
         import time
-        globals = func.__globals__ | {"time": time}
+        globals = {"time": time} | func.__globals__
     else:
         globals = func.__globals__
 
@@ -99,16 +99,15 @@ def transform_function_to_sync(func: Callable[P, Awaitable[R]]) -> Callable[P, R
     return new_func
 
 
-if __name__ == '__main__':
+if __name__ == '__main__': # pragma: no cover
     import asyncio
 
     y = 100
 
-    # 示例函数
     async def some_async_function(x: int) -> int:
         await asyncio.sleep(1)
         return x + y
 
-    # 转换函数
     new_func = transform_function_to_sync(some_async_function)
+
     print(new_func(3))

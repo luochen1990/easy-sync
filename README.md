@@ -56,16 +56,22 @@ asyncio.run(async_main())
 
 **NOTE: There are some requirements**
 
-This will generate a sync version code of your async function, which replaces all `await f(...)` into `f(...).wait()` and `await asyncio.sleep(...)` into `time.sleep(...)`.
+This will generate a sync version code of your async function, which replaces all `await f(...)` into `f(...).wait()` and `await asyncio.sleep(...)` statements inside the function body into `time.sleep(...)`.
 
-So you need to make sure all `await` statement is **sync compatible**.
+So you need to:
+
+1. Make sure all `await` statement inside the body of the decorated function is **sync compatible**.
 
 A statement is **sync compatible** here if it is one of the following cases:
 
-1. The called function `f` is decorated with `@sync_compatible` decorator, and called like `await f(...)`
-2. The called function is exactly `asyncio.sleep`, and the statement is literally `await asyncio.sleep(...)`
+    - The called function `f` is decorated with `@sync_compatible` decorator, and called like `await f(...)`
+    - The called function is exactly `asyncio.sleep`, and the statement is literally `await asyncio.sleep(...)`
 
 For other case, you might need to define a wrapper for yourself, via **The Name Reusing Style** of `@sync_compatible`
+
+2. Knowing that other decorators is ignored in the generated sync version code, since they are written for async functions, and very possible not support sync functions, keep them might cause unexpected error. If you really need them, please use **The Name Reusing Style** and add decorators manually.
+
+3. Knowing that if you use this decorator together with other decorators, make this the outer one can solve `.wait() method not found` issues.
 
 
 ### The Name Reusing Style

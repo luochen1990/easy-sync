@@ -25,16 +25,16 @@ class Waitable(Awaitable[R]):
 
     def _wait_async_thunk(self) -> R:
         ''' deprecated, only keeped for POC '''
-        ...
+        ... # pragma: no cover
 
 
 @overload
 def sync_compatible(fn: Callable[P, Awaitable[R]]) -> Callable[P, Waitable[R]]:
-    ...
+    ... # pragma: no cover
 
 @overload
 def sync_compatible(*, sync_fn: Callable[P, R]) -> Callable[ [Callable[P, Awaitable[R]]], Callable[P, Waitable[R]]]:
-    ...
+    ... # pragma: no cover
 
 def sync_compatible( #type: ignore
         sync_fn: Callable[P, Awaitable[R]] | Callable[P, R]) -> Callable[P, Waitable[R]] | Callable[ [Callable[P, Awaitable[R]]], Callable[P, Waitable[R]]]:
@@ -96,8 +96,9 @@ def sync_compatible( #type: ignore
         return wrapper_maker
 
     if asyncio.iscoroutinefunction(sync_fn):
-        async_fn = sync_fn # the function is async actually
-        real_sync_fn = transform_function_to_sync(async_fn)
-        return wrapper_maker_maker(real_sync_fn)(async_fn)
+        # 装饰器的无参数用法，这里的 sync_fn 直接是被装饰的 async 函数而不是 sync_fn 参数
+        fn = sync_fn # the function is async actually
+        real_sync_fn = transform_function_to_sync(fn)
+        return wrapper_maker_maker(real_sync_fn)(fn)
     else:
         return wrapper_maker_maker(sync_fn) #type: ignore
