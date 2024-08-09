@@ -42,18 +42,29 @@ class FunctionTransformer(ast.NodeTransformer):
         self.visited_nodes.add(node)
 
         # 将 async def 转换为 def，并修改函数名
-        _new_sync_node = ast.FunctionDef(
-            name=node.name + '__sync__',
-            args=node.args,
-            body=node.body,
-            decorator_list=[], #移除所有装饰器，因为它们是为异步函数设计的，很可能不适用于同步函数
-            returns=node.returns,
-            type_comment=node.type_comment,
-            lineno=node.lineno,
-            col_offset=node.col_offset,
-        )
         if sys.version_info >= (3, 12): #pragma: no cover
-            _new_sync_node.type_params = node.type_params
+            _new_sync_node = ast.FunctionDef(
+                name=node.name + '__sync__',
+                args=node.args,
+                body=node.body,
+                decorator_list=[], #移除所有装饰器，因为它们是为异步函数设计的，很可能不适用于同步函数
+                returns=node.returns,
+                type_comment=node.type_comment,
+                lineno=node.lineno,
+                col_offset=node.col_offset,
+                type_params = node.type_params
+            )
+        else:
+            _new_sync_node = ast.FunctionDef(
+                name=node.name + '__sync__',
+                args=node.args,
+                body=node.body,
+                decorator_list=[], #移除所有装饰器，因为它们是为异步函数设计的，很可能不适用于同步函数
+                returns=node.returns,
+                type_comment=node.type_comment,
+                lineno=node.lineno,
+                col_offset=node.col_offset,
+            )
 
         if self.is_toplevel:
             self.is_toplevel = False
@@ -65,18 +76,29 @@ class FunctionTransformer(ast.NodeTransformer):
             new_decorator = ast.Call(ast.Name(id='sync_compatible', ctx=ast.Load()), [], [ast.keyword(arg='sync_fn', value=ast.Name(id=node.name + '__sync__', ctx=ast.Load()))])
             new_decorator_list = [new_decorator if _is_sync_compatible_decorator(d) else d for d in node.decorator_list]
 
-            new_async_node = ast.AsyncFunctionDef(
-                name=node.name,
-                args=node.args,
-                body=node.body, #[self.visit(x) for x in node.body],
-                decorator_list=new_decorator_list, #替换装饰器
-                returns=node.returns,
-                type_comment=node.type_comment,
-                lineno=node.lineno,
-                col_offset=node.col_offset,
-            )
             if sys.version_info >= (3, 12): #pragma: no cover
-                new_sync_node.type_params = node.type_params
+                new_async_node = ast.AsyncFunctionDef(
+                    name=node.name,
+                    args=node.args,
+                    body=node.body, #[self.visit(x) for x in node.body],
+                    decorator_list=new_decorator_list, #替换装饰器
+                    returns=node.returns,
+                    type_comment=node.type_comment,
+                    lineno=node.lineno,
+                    col_offset=node.col_offset,
+                    type_params = node.type_params
+                )
+            else:
+                new_async_node = ast.AsyncFunctionDef(
+                    name=node.name,
+                    args=node.args,
+                    body=node.body, #[self.visit(x) for x in node.body],
+                    decorator_list=new_decorator_list, #替换装饰器
+                    returns=node.returns,
+                    type_comment=node.type_comment,
+                    lineno=node.lineno,
+                    col_offset=node.col_offset,
+                )
 
             self.new_nodes.add(new_async_node) #避免重复处理
 
