@@ -1,5 +1,6 @@
 import inspect
 import ast
+import sys
 from typing import Any, Awaitable, Callable, TypeVar, ParamSpec
 import textwrap
 
@@ -29,10 +30,12 @@ class FunctionTransformer(ast.NodeTransformer):
             decorator_list=[], #移除所有装饰器，因为它们是为异步函数设计的，很可能不适用于同步函数
             returns=node.returns,
             type_comment=node.type_comment,
-            type_params=getattr(node, "type_params", []), #NOTE: 只有3.12之后的版本才有这个属性
             lineno=node.lineno,
             col_offset=node.col_offset,
         )
+        if sys.version_info >= (3, 12):
+            new_node.type_params = node.type_params
+
         # 继续遍历新的函数定义节点
         return self.visit(new_node)
 
