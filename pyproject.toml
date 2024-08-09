@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "easy-sync"
-version = "0.1.0"
+version = "0.2.0"
 description = "Provide sync compatibility for your async functions"
 authors = [ "Luo Chen <luochen1990@gmail.com>" ]
 repository = "https://github.com/luochen1990/easy-sync"
