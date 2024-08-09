@@ -40,8 +40,18 @@ async def async_double(x: int) -> int:
     return r
 
 @sync_compatible
+async def async_list_comprehension(n: int) -> int:
+    return sum([await async_add(i, i) for i in range(n)])
+
+@sync_compatible
 async def async_calc():
-    r = await async_double(21)
+
+    @sync_compatible
+    async def async_nested_func():
+        r = await async_double(0)
+        return r
+
+    r = await async_double(15) + await async_list_comprehension(4) + await async_nested_func()
     print(r)
     return r
 
