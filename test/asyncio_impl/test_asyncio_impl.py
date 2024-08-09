@@ -1,6 +1,5 @@
 import asyncio
 from functools import wraps
-import asyncer
 from typing import Awaitable, Callable, TypeVar, ParamSpec
 import pytest
 import easy_sync
@@ -15,7 +14,10 @@ class Waitable(easy_sync.Waitable[R]):
 
     #@override
     def _wait_async_thunk(self) -> R:
-        return asyncer.syncify(self._async_thunk, raise_sync_error=False)() #type: ignore
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        r = loop.run_until_complete(self._async_thunk())
+        return r
 
 
 def sync_compatible(fn: Callable[P, Awaitable[R]]) -> Callable[P, Waitable[R]]:
