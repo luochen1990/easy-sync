@@ -1,6 +1,8 @@
 Easy Sync
 =========
 
+[![codecov](https://codecov.io/github/luochen1990/easy-sync/graph/badge.svg?token=OBG1BWIKC2)](https://codecov.io/github/luochen1990/easy-sync)
+
 Provide sync compatibility for your async functions
 
 Motivation
@@ -24,6 +26,8 @@ Features
 
 Usage
 -----
+
+Install via `pip install easy-sync` or `poetry add easy-sync` from ([pypi](https://pypi.org/project/easy-sync/))
 
 ### The Magic Style
 
