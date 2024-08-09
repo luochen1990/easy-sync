@@ -21,7 +21,7 @@ Features
 --------
 
 1. Expose a single function name for both async and sync version
-2. Automatic provide a sync vertion from your async function definition (via Metaprogramming)
+2. Automatic provide a sync version from your async function definition (via Metaprogramming)
 3. Lightweight, pure python, and no dependencies
 4. Complex cases such as list comprehensions, nested function definitions are also supported, feel free to write your pythonic code.
 5. Strict type annotation are contained, and validated by pylance the strict mode. all type information is kept here
@@ -47,7 +47,7 @@ print(async_add(1, 2).wait())
 
 **NOTE: There are some requirements**
 
-This will generate a sync version code of your async function, the magic is:
+This will generate a sync version code of your async function, the logic is:
 
 1. Replaces all `await f(...)` statements into `f(...).wait()`
 2. Replaces all `await asyncio.sleep(...)` statements into `time.sleep(...)`.
@@ -91,4 +91,4 @@ Run tests and Contribute
 
 You can use `nix develop .` or `poetry shell` under the project root to enter the develop environment.
 
-Run unit tests via `pytest` or `pytest --cov=src` for coverage report.
+Run unit tests via `pytest`, or run `pytest --cov=src` for coverage report.
