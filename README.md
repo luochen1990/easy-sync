@@ -8,21 +8,24 @@ Provide sync compatibility for your async functions
 Motivation
 ----------
 
-I don't want to always duplicate implementations for both synchronous and asynchronous versions of the same thing, and think out two name for each of them, as it is a waste of time.
+Everytime I provide a Python package to my user, I'm expected to provide both sync version and async version API at the same time.
 
-So I hope there is some magic which can turn my asynchronous function implementations into synchronous versions.
+But I don't want to always duplicate implementations for both synchronous and asynchronous versions of the same thing, and think out two name for each of them, as it is a waste of time, and far from DRY.
 
-I call this magic `@sync_compatible` here, with this decorator, your function `f` can be called via both `await f(x)` (in a asynchronous context) or `f(x).wait()` (in a synchronous context).
+I hope there is some magic which can turn my asynchronous function implementations into synchronous versions, so I can write once and get both of them.
+
+I call this magic `@sync_compatible` here, your decorated function `f` can be called via both `await f(x)` (in a asynchronous context) or `f(x).wait()` (in a synchronous context).
 
 
 Features
 --------
 
-1. Use a single name of function for both async and sync version
-2. Automatic provide a sync vertion from async version (code generation underground)
+1. Expose a single function name for both async and sync version
+2. Automatic provide a sync vertion from your async function definition (via Metaprogramming)
 3. Lightweight, pure python, and no dependencies
-4. Strict type annotation (validated by pylance the strict mode)
-5. Unit test, and test coverage ratio is monitored
+4. Complex cases such as list comprehensions, nested function definitions are also supported, feel free to write your pythonic code.
+5. Strict type annotation are contained, and validated by pylance the strict mode. all type information is kept here
+6. Unit tests contained, and test coverage ratio is monitored
 
 Usage
 -----
@@ -37,66 +40,49 @@ from easy_sync import sync_compatible
 @sync_compatible
 async def async_add(a: int, b: int) -> int:
     await asyncio.sleep(1)
-    ''' Add two numbers asynchronously '''
     return a + b
 
-def do_sync():
-
-    print(async_add(1, 2).wait())
-    print(async_add(3, 4).wait())
-
-do_sync()
-
-async def async_main():
-    result = await async_add(1, 2)
-    print(result)
-
-asyncio.run(async_main())
+print(async_add(1, 2).wait())
 ```
 
 **NOTE: There are some requirements**
 
-This will generate a sync version code of your async function, which replaces all `await f(...)` into `f(...).wait()` and `await asyncio.sleep(...)` statements inside the function body into `time.sleep(...)`.
+This will generate a sync version code of your async function, the magic is:
 
-So you need to:
-
-1. Make sure all `await` statement inside the body of the decorated function is **sync compatible**.
-
-A statement is **sync compatible** here if it is one of the following cases:
-
-    - The called function `f` is decorated with `@sync_compatible` decorator, and called like `await f(...)`
-    - The called function is exactly `asyncio.sleep`, and the statement is literally `await asyncio.sleep(...)`
+1. Replaces all `await f(...)` statements into `f(...).wait()`
+2. Replaces all `await asyncio.sleep(...)` statements into `time.sleep(...)`.
 
 For other case, you might need to define a wrapper for yourself, via **The Name Reusing Style** of `@sync_compatible`
 
-2. Knowing that other decorators is ignored in the generated sync version code, since they are written for async functions, and very possible not support sync functions, keep them might cause unexpected error. If you really need them, please use **The Name Reusing Style** and add decorators manually.
+#### Tips about extra decorators
 
-3. Knowing that if you use this decorator together with other decorators, make this the outer one can solve `.wait() method not found` issues.
+1. Extra decorators is ignored in the generated sync function, since they are written for async functions and probably not works on sync functions, keep them might cause unexpected error. If you really need them, please use **The Name Reusing Style** and add decorators manually.
+2. When used with extra decorators, lift this outer can solve `.wait() method not found` issues.
 
 
 ### The Name Reusing Style
 
-Use this helper to just reuse name only, you need to provide the sync version yourself.
+Instead of use the magic, you are allowed to provide the sync function yourself, and expose a single name to users.
 
 This is useful to define your own wrapper, or cover some special cases the magic style cannot handle.
 
 ```python
 from easy_sync import sync_compatible
 
-@sync_compatible(sync_fn = _sync_add)
-async def async_add(a: int, b: int) -> int:
-    await asyncio.sleep(1)
-    return a + b
+@sync_compatible(sync_fn = _sync_fetch_url)
+async def fetch_url(url: str) -> str:
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            return await response.text()
 
-def _sync_add(a: int, b: int) -> int:
-    sleep(1)
-    return a + b
+def _sync_fetch_url(url: str) -> str:
+    return requests.get(url).text
 
-def main():
-    print(async_add(1, 2).wait())
-    print(async_add(3, 4).wait())
+@sync_compatible
+async def get_data() -> str:
+    return await fetch_url("https://site.name/path")
 
-main()
+print(get_data().wait())
 ```
 
 
@@ -105,6 +91,4 @@ Run tests and Contribute
 
 You can use `nix develop .` or `poetry shell` under the project root to enter the develop environment.
 
-Currently, if you run `pytest` you will find that some cases is marked as `xfailed`, which are tests for WIP usage.
-
-You can change the [alternative impl code](/test/asyncer_impl/test_asyncer_impl.py) to your own implementation and re-run `pytest`.
+Run unit tests via `pytest` or `pytest --cov=src` for coverage report.
