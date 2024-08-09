@@ -24,8 +24,10 @@ class Waitable(Awaitable[R]):
 
     def _wait_async_thunk(self) -> R:
         ''' sync wait for the result '''
-        r : R = asyncio.run(self._async_thunk()) #type: ignore
-        return r #type: ignore
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        r = loop.run_until_complete(self._async_thunk())
+        return r
 
 
 @overload
