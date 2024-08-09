@@ -18,4 +18,4 @@ def test_so_question():
     ''' This MRE is from: https://stackoverflow.com/q/77274838/1608276 '''
 
     print("Calling in asyncio context")
-    asyncio.get_event_loop().run_until_complete(async_main())
+    asyncio.run(async_main())
