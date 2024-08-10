@@ -74,27 +74,36 @@ def sync_compatible( #type: ignore
         ```
     '''
 
-    def wrapper_maker_maker(sync_fn: Callable[P, R]) -> Callable[ [Callable[P, Awaitable[R]]], Callable[P, Waitable[R]]]:
-        def wrapper_maker(fn: Callable[P, Awaitable[R]]) -> Callable[P, Waitable[R]]:
-
-            @wraps(fn)
-            def wrapper(*args: P.args, **kwargs: P.kwargs) -> Waitable[R]:
-
-                def sync_thunk() -> R:
-                    return sync_fn(*args, **kwargs) #type: ignore
-
-                def async_thunk() -> Awaitable[R]:
-                    return fn(*args, **kwargs)
-
-                return Waitable(async_thunk=async_thunk, sync_thunk=sync_thunk)
-
-            return wrapper
-        return wrapper_maker
-
     if asyncio.iscoroutinefunction(sync_fn):
         # 装饰器的无参数用法，这里的 sync_fn 直接是被装饰的 async 函数而不是 sync_fn 参数
         fn = sync_fn # the function is async actually
-        real_sync_fn = transform_function_to_sync(fn)
-        return wrapper_maker_maker(real_sync_fn)(fn)
+        return sync_compatible_auto(fn)
     else:
-        return wrapper_maker_maker(sync_fn) #type: ignore
+        return sync_compatible_manual(sync_fn) #type: ignore
+
+
+def sync_compatible_auto(fn: Callable[P, Awaitable[R]]) -> Callable[P, Waitable[R]]:
+    real_sync_fn = transform_function_to_sync(fn)
+    return _wrapper_maker_maker(real_sync_fn)(fn)
+
+
+def sync_compatible_manual(sync_fn: Callable[P, R]) -> Callable[ [Callable[P, Awaitable[R]]], Callable[P, Waitable[R]]]:
+    return _wrapper_maker_maker(sync_fn)
+
+
+def _wrapper_maker_maker(sync_fn: Callable[P, R]) -> Callable[ [Callable[P, Awaitable[R]]], Callable[P, Waitable[R]]]:
+    def wrapper_maker(fn: Callable[P, Awaitable[R]]) -> Callable[P, Waitable[R]]:
+
+        @wraps(fn)
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -> Waitable[R]:
+
+            def sync_thunk() -> R:
+                return sync_fn(*args, **kwargs) #type: ignore
+
+            def async_thunk() -> Awaitable[R]:
+                return fn(*args, **kwargs)
+
+            return Waitable(async_thunk=async_thunk, sync_thunk=sync_thunk)
+
+        return wrapper
+    return wrapper_maker
