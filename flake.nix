@@ -15,30 +15,38 @@
     });
   in
   {
+    packages = eachSystem ({pkgs, ...}: {
+      easy-sync = let
+        pyproject = pkgs.lib.importTOML ./pyproject.toml;
+        meta = pyproject.tool.poetry;
+      in
+      pkgs.python3Packages.buildPythonPackage {
+        pname = meta.name;
+        version = meta.version;
+        pyproject = true;
+        src = ./.;
+        buildInputs = [ pkgs.python3Packages.poetry-core ];
+        doCheck = true;
+        meta = with pkgs.lib; {
+          description = meta.description;
+          homepage = meta.repository;
+          license = licenses.asl20;
+          maintainers = with maintainers; [ luochen1990 ];
+        };
+      };
+    });
+
     devShells = eachSystem ({pkgs, python, ...}: rec {
       default = poetry;
-
       poetry = pkgs.mkShell {
         buildInputs = [
           python
           pkgs.poetry
         ];
-
         shellHook = ''
           export PATH=$(poetry env info --path)/bin:$PATH
         '';
       };
     });
-
-    apps = eachSystem ({system, pkgs, ...}: {
-      default = {
-        type = "app";
-        program = "${pkgs.writeShellScript "funix-app" ''
-          source ${self.devShells.${system}.default.shellHook}
-          funix .
-        ''}";
-      };
-    });
-
   };
 }
