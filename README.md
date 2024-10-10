@@ -52,7 +52,7 @@ This will generate a sync version code of your async function, the logic is:
 1. Replaces all `await f(...)` statements into `f(...).wait()`
 2. Replaces all `await asyncio.sleep(...)` statements into `time.sleep(...)`.
 
-For other case, you might need to define a wrapper for yourself, via **The Name Reusing Style** of `@sync_compatible`
+For other cases, you might need to define a wrapper for yourself, via [**The Name Reusing Style**](#the-name-reusing-style) of `@sync_compatible`
 
 #### Tips about extra decorators
 
