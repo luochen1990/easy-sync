@@ -1,6 +1,7 @@
 import asyncio
 from functools import wraps
-from typing import Awaitable, Callable, TypeAlias, TypeVar, ParamSpec, overload
+from collections.abc import Awaitable, Callable
+from typing import TypeAlias, TypeVar, ParamSpec, overload
 from easy_sync.transform import transform_function_to_sync
 
 

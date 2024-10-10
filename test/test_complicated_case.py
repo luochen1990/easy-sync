@@ -3,7 +3,8 @@ import time
 from easy_sync import sync_compatible
 
 from functools import wraps
-from typing import Awaitable, Callable, TypeVar, ParamSpec
+from collections.abc import Awaitable, Callable
+from typing import TypeVar, ParamSpec
 
 
 P = ParamSpec("P")

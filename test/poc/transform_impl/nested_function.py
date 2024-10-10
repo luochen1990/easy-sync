@@ -1,8 +1,8 @@
-
 import inspect
 
 import asyncio
-from typing import Awaitable, Callable, TypeAlias, TypeVar, ParamSpec
+from collections.abc import Awaitable, Callable
+from typing import TypeAlias, TypeVar, ParamSpec
 
 
 P = ParamSpec("P")

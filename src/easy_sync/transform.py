@@ -1,7 +1,8 @@
 import inspect
 import ast
 import sys
-from typing import Any, Awaitable, Callable, TypeVar, ParamSpec
+from collections.abc import Awaitable, Callable
+from typing import Any, TypeVar, ParamSpec
 import textwrap
 
 P = ParamSpec("P")
