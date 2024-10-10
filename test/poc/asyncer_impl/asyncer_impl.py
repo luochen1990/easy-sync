@@ -1,6 +1,6 @@
 import asyncio
 from functools import wraps
-import asyncer
+import asyncer #type: ignore
 from collections.abc import Awaitable, Callable
 from typing import TypeAlias, TypeVar, ParamSpec
 import pytest
