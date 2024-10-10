@@ -5,7 +5,7 @@
     nixpkgs.url = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs }:
+  outputs = { nixpkgs, ... }:
   let
     supportedSystems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
     eachSystem = f: nixpkgs.lib.genAttrs supportedSystems (system: f rec {
