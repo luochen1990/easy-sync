@@ -38,7 +38,7 @@ def sync_compatible( #type: ignore
     '''
     A decorator to make an async function sync compatible
 
-    Usage 1 (use the default sync version, not recommended since it uses asyncio.run() and not works in nested async functions for now):
+    Usage 1 (generate sync version automatically):
 
         ```
         @sync_compatible
@@ -54,7 +54,7 @@ def sync_compatible( #type: ignore
         ```
 
 
-    Usage 2 (reuse name only, you need to provide the sync version yourself):
+    Usage 2 (reuse name only, specify the sync version yourself):
 
         ```
         def _sync_add(a: int, b: int) -> int:
