@@ -3,8 +3,8 @@ from easy_sync import sync_compatible
 
 @sync_compatible
 async def async_add(a: int, b: int) -> int:
-    await asyncio.sleep(0.1)
     ''' Add two numbers asynchronously '''
+    await asyncio.sleep(0.1)
     return a + b
 
 def test_simple_case():

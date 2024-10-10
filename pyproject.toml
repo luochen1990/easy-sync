@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "easy-sync"
 version = "0.2.2"
-description = "Provide sync compatibility for your async functions"
+description = "Easily provide synchronous compatibility for your Python asynchronous functions"
 authors = [ "Luo Chen <luochen1990@gmail.com>" ]
 repository = "https://github.com/luochen1990/easy-sync"
 readme = "README.md"

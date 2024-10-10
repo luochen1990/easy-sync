@@ -3,7 +3,7 @@ Easy Sync
 
 [![codecov](https://codecov.io/github/luochen1990/easy-sync/graph/badge.svg?token=OBG1BWIKC2)](https://codecov.io/github/luochen1990/easy-sync)
 
-Provide sync compatibility for your async functions
+Easily provide synchronous compatibility for your Python asynchronous functions
 
 Motivation
 ----------
