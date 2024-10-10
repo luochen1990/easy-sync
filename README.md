@@ -63,17 +63,17 @@ This will generate a sync version code of your async function, the logic is:
 1. Replaces all `await f(...)` statements into `f(...).wait()`
 2. Replaces all `await asyncio.sleep(...)` statements into `time.sleep(...)`.
 
-For other cases, you might need to define a wrapper for yourself, via [**The Name Reusing Usage**](#the-name-reusing-usage) of `@sync_compatible`
+For other cases, you might need to define a wrapper for yourself, via [**The Manual Usage**](#the-manual-usage) of `@sync_compatible`
 
 **Tips**
 
-1. Extra decorators is ignored in the generated sync function, since they are written for async functions and probably not works on sync functions, keep them might cause unexpected error. If you really need them, please use [**The Name Reusing Usage**](#the-name-reusing-usage) and add decorators manually.
+1. Extra decorators is ignored in the generated sync function, since they are written for async functions and probably not works on sync functions, keep them might cause unexpected error. If you really need them, please use [**The Manual Usage**](#the-manual-usage) and add decorators manually.
 2. If you got `.wait() method not found` issues when use the `@sync_compatible` decorator with extra decorators, try lift this outer
 
 
-### The Name Reusing Usage
+### The Manual Usage
 
-Instead of automatic generate the sync version, you are allowed to provide the sync function yourself, and expose a single name to users.
+Instead of automatic generate the sync version, you are allowed to provide the sync function manually, and expose a single name to users.
 
 This is useful to define your own wrapper, or cover some special cases the automatic usage cannot handle.
 
