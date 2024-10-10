@@ -27,12 +27,25 @@ Features
 5. Strict type annotation are contained, and validated by pylance the strict mode. all type information is kept here
 6. Unit tests contained, and test coverage ratio is monitored
 
+Install
+-------
+
+```sh
+pip install easy-sync
+```
+or
+
+```sh
+poetry add easy-sync
+```
+
+from ([pypi](https://pypi.org/project/easy-sync/))
+
 Usage
 -----
 
-Install via `pip install easy-sync` or `poetry add easy-sync` from ([pypi](https://pypi.org/project/easy-sync/))
 
-### The Magic Style
+### The Automatic Usage
 
 ```python
 from easy_sync import sync_compatible
@@ -45,26 +58,24 @@ async def async_add(a: int, b: int) -> int:
 print(async_add(1, 2).wait())
 ```
 
-**NOTE: There are some requirements**
-
 This will generate a sync version code of your async function, the logic is:
 
 1. Replaces all `await f(...)` statements into `f(...).wait()`
 2. Replaces all `await asyncio.sleep(...)` statements into `time.sleep(...)`.
 
-For other cases, you might need to define a wrapper for yourself, via [**The Name Reusing Style**](#the-name-reusing-style) of `@sync_compatible`
+For other cases, you might need to define a wrapper for yourself, via [**The Name Reusing Usage**](#the-name-reusing-usage) of `@sync_compatible`
 
-#### Tips about extra decorators
+**Tips**
 
-1. Extra decorators is ignored in the generated sync function, since they are written for async functions and probably not works on sync functions, keep them might cause unexpected error. If you really need them, please use **The Name Reusing Style** and add decorators manually.
-2. When used with extra decorators, lift this outer can solve `.wait() method not found` issues.
+1. Extra decorators is ignored in the generated sync function, since they are written for async functions and probably not works on sync functions, keep them might cause unexpected error. If you really need them, please use [**The Name Reusing Usage**](#the-name-reusing-usage) and add decorators manually.
+2. If you got `.wait() method not found` issues when use the `@sync_compatible` decorator with extra decorators, try lift this outer
 
 
-### The Name Reusing Style
+### The Name Reusing Usage
 
-Instead of use the magic, you are allowed to provide the sync function yourself, and expose a single name to users.
+Instead of automatic generate the sync version, you are allowed to provide the sync function yourself, and expose a single name to users.
 
-This is useful to define your own wrapper, or cover some special cases the magic style cannot handle.
+This is useful to define your own wrapper, or cover some special cases the automatic usage cannot handle.
 
 ```python
 from easy_sync import sync_compatible
